@@ -32,34 +32,42 @@ public class Strassen {
      * $ ./strassen 0 dimension inputfile
      */
     public static void main(String[] args) {
-        int d = Integer.parseInt(args[2]);
+//        int d = Integer.parseInt(args[2]);
+//        
+//        // dump ASCII file into matrices A and B
+//        int[][]a = new int[d][d];
+//        int[][]b = new int[d][d];
+//        
+//        try {
+//            InputStream fis = new FileInputStream(args[3]);
+//            BufferedReader br = new BufferedReader(new InputStreamReader(fis, Charset.forName("UTF-8")));
+//            for (int i = 0; i < d; i++) {
+//                for (int j = 0; j < d; j++) {
+//                    a[i][j] = Integer.parseInt(br.readLine());
+//                }
+//            }
+//            for (int i = 0; i < d; i++) {
+//                for (int j = 0; j < d; j++) {
+//                    b[i][j] = Integer.parseInt(br.readLine());
+//                }
+//            }
+//        }
+//        catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        checkInput(a, b);
         
-        // dump ASCII file into matrices A and B
-        int[][]a = new int[d][d];
-        int[][]b = new int[d][d];
-        
-        try {
-            InputStream fis = new FileInputStream(args[3]);
-            BufferedReader br = new BufferedReader(new InputStreamReader(fis, Charset.forName("UTF-8")));
-            for (int i = 0; i < d; i++) {
-                for (int j = 0; j < d; j++) {
-                    a[i][j] = Integer.parseInt(br.readLine());
-                }
-            }
-            for (int i = 0; i < d; i++) {
-                for (int j = 0; j < d; j++) {
-                    b[i][j] = Integer.parseInt(br.readLine());
-                }
-            }
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-        checkInput(a, b);
+        int d = 4;
+        int[][] a = genMatrix(d);
+        int[][] b = genMatrix(d);
+        printMatrix(a);
+        printMatrix(b);
         
         Strassen s = new Strassen();
         int[][]ans = new int[d][d];
         ans = s.multiplyStrassen(a, b, ans);
+        s.dumpMatrices();
+        printMatrix(ans);
     }
     
     public int[][] multiplyStrassen(int[][] a, int[][] b, int[][] ans) {
@@ -72,7 +80,7 @@ public class Strassen {
         p5 = new int[n/2][n-1];
         p6 = new int[n/2][n-1];
         p7 = new int[n/2][n-1];
-        t1= new int[n/2][n-1];
+        t1 = new int[n/2][n-1];
         t2 = new int[n/2][n-1];
         
         return rec_mult(a, b, ans, n, 0, 0);
@@ -149,8 +157,8 @@ public class Strassen {
             // T1 = A12 - A22; T2 = B21 + B22
             for (int i = 0; i < dim; i++) {
                 for (int j = 0; j < dim; j++) {
-                    t1[i][j + offs] = a[i][j + j0] + a[i + dim][j + j0 + dim];
-                    t2[i][j + offs] = b[i][j + j0] + b[i + dim][j + j0 + dim];
+                    t1[i][j + offs] = a[i][j + j0 + dim] - a[i + dim][j + j0 + dim];
+                    t2[i][j + offs] = b[i + dim][j + j0] + b[i + dim][j + j0 + dim];
                 }
             }
             
@@ -167,16 +175,16 @@ public class Strassen {
             }
             
             // P7 = T1 * T2
-            rec_mult(t1, t2, p5, dim, offs, offs + dim);
+            rec_mult(t1, t2, p7, dim, offs, offs + dim);
         }
         
         // combine
         for (int i = 0; i < dim; i++) {
             for (int j = 0; j < dim; j++) {
-                ans[i][j] = p5[i][j + offs] + p4[i][j + offs] - p2[i][j + offs] + p6[i][j + offs];
-                ans[i][j + j0] = p1[i][j + offs] + p2[i][j + offs];
-                ans[i + dim][j] = p3[i][j + offs] + p4[i][j + offs];
-                ans[i + dim][j + j0] = p5[i][j + offs] + p1[i][j + offs] - p3[i][j + offs] - p7[i][j + offs];
+                ans[i][j + j0] = p5[i][j + offs] + p4[i][j + offs] - p2[i][j + offs] + p6[i][j + offs];
+                ans[i][j + j0 + dim] = p1[i][j + offs] + p2[i][j + offs];
+                ans[i + dim][j + j0] = p3[i][j + offs] + p4[i][j + offs];
+                ans[i + dim][j + j0 + dim] = p5[i][j + offs] + p1[i][j + offs] - p3[i][j + offs] - p7[i][j + offs];
             }
         }
         return ans;
@@ -236,7 +244,7 @@ public class Strassen {
         int[][] ans = new int[n][n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                ans[i][j] = (int)(Math.round(Math.random() * 10));
+                ans[i][j] = (int)(Math.round(Math.random() * 9));
             }
         }
         return ans;
@@ -252,5 +260,26 @@ public class Strassen {
             System.out.println();
         }
         System.out.println();
+    }
+    
+    public void dumpMatrices() {
+        System.out.println("P1: ");
+        printMatrix(p1);
+        System.out.println("P2: ");
+        printMatrix(p2);
+        System.out.println("P3: ");
+        printMatrix(p3);
+        System.out.println("P4: ");
+        printMatrix(p4);
+        System.out.println("P5: ");
+        printMatrix(p5);
+        System.out.println("P6: ");
+        printMatrix(p6);
+        System.out.println("P7: ");
+        printMatrix(p7);
+        System.out.println("T1: ");
+        printMatrix(t1);
+        System.out.println("T2: ");
+        printMatrix(t2);
     }
 }
