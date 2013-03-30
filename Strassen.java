@@ -87,10 +87,10 @@ public class Strassen {
     }
     
     public int[][] rec_mult (int[][] a, int[][] b,
-            int[][] ans, int n, int j0, int offs) {
+            int[][] c, int n, int j0, int offs) {
         int dim = n / 2;
         if (n == 1) {
-            ans[0][j0] = a[0][j0] * b[0][j0];
+            c[0][j0] = a[0][j0] * b[0][j0];
         }
         else {
             // P1 = A11(B12 - B22)
@@ -181,32 +181,38 @@ public class Strassen {
         // combine
         for (int i = 0; i < dim; i++) {
             for (int j = 0; j < dim; j++) {
-                ans[i][j + j0] = p5[i][j + offs] + p4[i][j + offs] - p2[i][j + offs] + p6[i][j + offs];
-                ans[i][j + j0 + dim] = p1[i][j + offs] + p2[i][j + offs];
-                ans[i + dim][j + j0] = p3[i][j + offs] + p4[i][j + offs];
-                ans[i + dim][j + j0 + dim] = p5[i][j + offs] + p1[i][j + offs] - p3[i][j + offs] - p7[i][j + offs];
+                // C11 = P5 + P4 - P2 + P6
+                c[i][j + j0] = p5[i][j + offs] + p4[i][j + offs] - p2[i][j + offs] + p6[i][j + offs];
+                
+                // C12 = P1 + P2
+                c[i][j + j0 + dim] = p1[i][j + offs] + p2[i][j + offs];
+                
+                // C21 = P3 + P4
+                c[i + dim][j + j0] = p3[i][j + offs] + p4[i][j + offs];
+                
+                // C22 = P5 + P1 - P3 - P7
+                c[i + dim][j + j0 + dim] = p5[i][j + offs] + p1[i][j + offs] - p3[i][j + offs] - p7[i][j + offs];
             }
         }
-        return ans;
+        return c;
     }
     
         public int[][] multiplyStandard(int[][] a, int[][] b) {
         checkInput(a, b);
         int n = a.length;
-        int[][] ans = new int[n][n];
+        int[][] c = new int[n][n];
         // loop through rows of matrix A
         for (int i = 0; i < n; i++) {
-            // loop through columns of matrix A
-            for (int j = 0; j < n; j++) {
+            // loop through rows of matrix B
+            for (int k = 0; k < n; k++) {
                 int sum = 0;
-                // loop through rows of matrix B
-                for (int k = 0; k < n; k++) {
-                    sum += a[i][k] * b[k][j];
+                // loop through columns of matrix A
+                for (int j = 0; j < n; j++) {
+                    c[i][j] = c[i][j] + a[i][k]*b[k][j];
                 }
-                ans[i][j] = sum;
             }
         }
-        return ans;
+        return c;
     }
     
     public int[][] add(int[][] a, int[][] b, int sign) {
@@ -281,5 +287,9 @@ public class Strassen {
         printMatrix(t1);
         System.out.println("T2: ");
         printMatrix(t2);
+    }
+    
+    public static boolean isPowerOf2(int n) {
+        return (n & -n) == n; 
     }
 }
