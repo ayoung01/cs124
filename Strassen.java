@@ -4,33 +4,193 @@
  */
 package strassen;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+
 /**
  *
  * @author ayoung
  */
 public class Strassen {
-
+    
+    int[][] p1;
+    int[][] p2;
+    int[][] p3;
+    int[][] p4;
+    int[][] p5;
+    int[][] p6;
+    int[][] p7;
+    int[][] t1;
+    int[][] t2;
+    
     /**
      * @param args the command line arguments
+     * $ ./strassen 0 dimension inputfile
      */
     public static void main(String[] args) {
-        double[][]a = genMatrix(2);
-        double[][]b = genMatrix(2);
-        printMatrix(a);
-        printMatrix(b);
-        printMatrix(add(a, b, -1));
-        printMatrix(multiply(a, b));
+        int d = Integer.parseInt(args[2]);
+        
+        // dump ASCII file into matrices A and B
+        int[][]a = new int[d][d];
+        int[][]b = new int[d][d];
+        
+        try {
+            InputStream fis = new FileInputStream(args[3]);
+            BufferedReader br = new BufferedReader(new InputStreamReader(fis, Charset.forName("UTF-8")));
+            for (int i = 0; i < d; i++) {
+                for (int j = 0; j < d; j++) {
+                    a[i][j] = Integer.parseInt(br.readLine());
+                }
+            }
+            for (int i = 0; i < d; i++) {
+                for (int j = 0; j < d; j++) {
+                    b[i][j] = Integer.parseInt(br.readLine());
+                }
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        checkInput(a, b);
+        
+        Strassen s = new Strassen();
+        int[][]ans = new int[d][d];
+        ans = s.multiplyStrassen(a, b, ans);
     }
     
-    public static double[][] multiply(double[][] a, double[][] b) {
+    public int[][] multiplyStrassen(int[][] a, int[][] b, int[][] ans) {
+        int n = ans.length;
+        
+        p1 = new int[n/2][n-1];
+        p2 = new int[n/2][n-1];
+        p3 = new int[n/2][n-1];
+        p4 = new int[n/2][n-1];
+        p5 = new int[n/2][n-1];
+        p6 = new int[n/2][n-1];
+        p7 = new int[n/2][n-1];
+        t1= new int[n/2][n-1];
+        t2 = new int[n/2][n-1];
+        
+        return rec_mult(a, b, ans, n, 0, 0);
+    }
+    
+    public int[][] rec_mult (int[][] a, int[][] b,
+            int[][] ans, int n, int j0, int offs) {
+        int dim = n / 2;
+        if (n == 1) {
+            ans[0][j0] = a[0][j0] * b[0][j0];
+        }
+        else {
+            // P1 = A11(B12 - B22)
+            // T1 = A11; T2 = B12 - B22
+            for (int i = 0; i < dim; i++) {
+                for (int j = 0; j < dim; j++) {
+                    t1[i][j + offs] = a[i][j + j0];
+                    t2[i][j + offs] = b[i][j + j0 + dim] - b[i + dim][j + j0 + dim];
+                }
+            }
+            
+            // P1 = T1 * T2
+            rec_mult(t1, t2, p1, dim, offs, offs + dim);
+            
+            // P2 = (A11 + A12)B22
+            // T1 = A11 + A12; T2 = B22
+            for (int i = 0; i < dim; i++) {
+                for (int j = 0; j < dim; j++) {
+                    t1[i][j + offs] = a[i][j + j0] + a[i][j + j0 + dim];
+                    t2[i][j + offs] = b[i + dim][j + j0 + dim];
+                }
+            }
+            
+            // P2 = T1 * T2
+            rec_mult(t1, t2, p2, dim, offs, offs + dim);
+            
+            // P3 = (A21 + A22)B11
+            // T1 = A21 + A22; T2 = B11
+            for (int i = 0; i < dim; i++) {
+                for (int j = 0; j < dim; j++) {
+                    t1[i][j + offs] = a[i + dim][j + j0] + a[i + dim][j + j0 + dim];
+                    t2[i][j + offs] = b[i][j + j0];
+                }
+            }
+            
+            // P3 = T1 * T2
+            rec_mult(t1, t2, p3, dim, offs, offs + dim);
+            
+            // P4 = A22(B21 - B11)
+            // T1 = A22; T2 = B21 - B11
+            for (int i = 0; i < dim; i++) {
+                for (int j = 0; j < dim; j++) {
+                    t1[i][j + offs] = a[i + dim][j + j0 + dim];
+                    t2[i][j + offs] = b[i + dim][j + j0] - b[i][j + j0];
+                }
+            }
+            
+            // P4 = T1 * T2
+            rec_mult(t1, t2, p4, dim, offs, offs + dim);
+            
+            // P5 = (A11 + A22)(B11 + B22)
+            // T1 = A11 + A22; T2 = B11 + B22
+            for (int i = 0; i < dim; i++) {
+                for (int j = 0; j < dim; j++) {
+                    t1[i][j + offs] = a[i][j + j0] + a[i + dim][j + j0 + dim];
+                    t2[i][j + offs] = b[i][j + j0] + b[i + dim][j + j0 + dim];
+                }
+            }
+            
+            // P5 = T1 * T2
+            rec_mult(t1, t2, p5, dim, offs, offs + dim);
+            
+            // P6 = (A12 - A22)(B21 + B22)
+            // T1 = A12 - A22; T2 = B21 + B22
+            for (int i = 0; i < dim; i++) {
+                for (int j = 0; j < dim; j++) {
+                    t1[i][j + offs] = a[i][j + j0] + a[i + dim][j + j0 + dim];
+                    t2[i][j + offs] = b[i][j + j0] + b[i + dim][j + j0 + dim];
+                }
+            }
+            
+            // P6 = T1 * T2
+            rec_mult(t1, t2, p6, dim, offs, offs + dim);
+            
+            // P7 = (A11 - A21)(B11 + B12)
+            // T1 = A11 + A22; T2 = B11 + B12
+            for (int i = 0; i < dim; i++) {
+                for (int j = 0; j < dim; j++) {
+                    t1[i][j + offs] = a[i][j + j0] - a[i + dim][j + j0];
+                    t2[i][j + offs] = b[i][j + j0] + b[i][j + j0 + dim];
+                }
+            }
+            
+            // P7 = T1 * T2
+            rec_mult(t1, t2, p5, dim, offs, offs + dim);
+        }
+        
+        // combine
+        for (int i = 0; i < dim; i++) {
+            for (int j = 0; j < dim; j++) {
+                ans[i][j] = p5[i][j + offs] + p4[i][j + offs] - p2[i][j + offs] + p6[i][j + offs];
+                ans[i][j + j0] = p1[i][j + offs] + p2[i][j + offs];
+                ans[i + dim][j] = p3[i][j + offs] + p4[i][j + offs];
+                ans[i + dim][j + j0] = p5[i][j + offs] + p1[i][j + offs] - p3[i][j + offs] - p7[i][j + offs];
+            }
+        }
+        return ans;
+    }
+    
+        public int[][] multiplyStandard(int[][] a, int[][] b) {
         checkInput(a, b);
         int n = a.length;
-        double[][] ans = new double[n][n];
+        int[][] ans = new int[n][n];
         // loop through rows of matrix A
         for (int i = 0; i < n; i++) {
             // loop through columns of matrix A
             for (int j = 0; j < n; j++) {
-                double sum = 0.0;
+                int sum = 0;
                 // loop through rows of matrix B
                 for (int k = 0; k < n; k++) {
                     sum += a[i][k] * b[k][j];
@@ -41,7 +201,7 @@ public class Strassen {
         return ans;
     }
     
-    public static double[][] add(double[][] a, double[][] b, int sign) {
+    public int[][] add(int[][] a, int[][] b, int sign) {
         checkInput(a, b);
         int n = a.length;
         // loop through rows
@@ -54,12 +214,7 @@ public class Strassen {
         return a;
     }
     
-    public static void multiplyStrassen (double[][] a, double[][] b,
-            double[] ans, int n, double offset) {
-        
-    }
-    
-    public static void checkInput(double[][] a, double[][] b) {
+    public static void checkInput(int[][] a, int[][] b) {
         int rows_a = a.length;
         int cols_a = a[0].length;
         int rows_b = b.length;
@@ -77,17 +232,17 @@ public class Strassen {
     }
     
     // generates a random nxn matrix
-    public static double[][] genMatrix(int n) {
-        double[][] ans = new double[n][n];
+    public static int[][] genMatrix(int n) {
+        int[][] ans = new int[n][n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                ans[i][j] = Math.round(Math.random() * 10);
+                ans[i][j] = (int)(Math.round(Math.random() * 10));
             }
         }
         return ans;
     }
     
-    public static void printMatrix(double[][] a) {
+    public static void printMatrix(int[][] a) {
         for (int i = 0; i < a.length; i++) {
             System.out.print("| ");
             for (int j = 0; j < a.length; j++) {
