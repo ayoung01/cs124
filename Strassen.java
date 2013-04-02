@@ -11,7 +11,7 @@ import java.nio.charset.Charset;
  */
 public class Strassen {
     
-    final int CROSSOVER = 15;
+    final static int CROSSOVER = 15;
 
     int[][] p1;
     int[][] p2;
@@ -53,18 +53,21 @@ public class Strassen {
 //        }
 //        checkInput(a, b);
         
-        int d = 3;
-        int[][] a = genMatrix(d);
-        int[][] b = genMatrix(d);
+        Strassen s = new Strassen();
+
+        int d = 20;
+        int pad = s.padSize(d);
+        int[][] a = padMatrix(genMatrix(d), d, pad);
+        int[][] b = padMatrix(genMatrix(d), d, pad);
         printMatrix(a);
         printMatrix(b);
         
-        Strassen s = new Strassen();
-        int[][]ans = new int[d][d];
+        int[][] ans = new int[pad][pad];
         ans = s.multiplyStrassen(a, b, ans);
+        ans = stripMatrix(ans, pad, d);
         s.dumpMatrices();
         printMatrix(ans);
-        s.testPadSize();
+        testPadSize();
     }
     
     public int[][] multiplyStrassen(int[][] a, int[][] b, int[][] ans) {
@@ -289,8 +292,10 @@ public class Strassen {
         return (n & -n) == n; 
     }
 
-    public int padSize (int n){
-        if (isPowerOf2(n)){
+    public static int padSize (int n){
+        if (n < CROSSOVER){
+            return n;
+        }else if (isPowerOf2(n)){
             return n;
         }else{
             int counter = CROSSOVER;
@@ -301,8 +306,39 @@ public class Strassen {
         }
     }
 
-    public void testPadSize(){
+    public static void testPadSize(){
         assert (174) == 240;
         assert (92) == 120;
+    }
+
+    /* takes original matrix, original dimension, new dimension */
+    public static int[][] padMatrix(int[][] mat, int dim, int ndim){
+        if (dim == ndim){  return mat; }
+
+        int[][] nmat = new int[ndim][ndim];
+        for (int r = 0; r < ndim; r+=1){
+            for(int c = 0; c < ndim; c+=1){
+                if(r < dim && c < dim){
+                    nmat[r][c] = mat[r][c];
+                }else{
+                    nmat[r][c] = 0;
+                }
+            }
+
+        }
+        return nmat;
+    }
+
+    /* takes padded matrix, padded dimension, original dimension */
+    public static int[][] stripMatrix(int[][] mat, int dim, int odim){
+        if (dim == odim){  return mat; }
+
+        int[][] omat = new int[odim][odim];
+        for (int r = 0; r < odim; r+=1){
+            for(int c = 0; c < odim; c+=1){
+                omat[r][c] = mat[r][c];
+            }
+        }
+        return omat;
     }
 }
