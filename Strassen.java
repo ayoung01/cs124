@@ -11,6 +11,8 @@ import java.nio.charset.Charset;
  */
 public class Strassen {
     
+    final int CROSSOVER = 15;
+
     int[][] p1;
     int[][] p2;
     int[][] p3;
@@ -51,7 +53,7 @@ public class Strassen {
 //        }
 //        checkInput(a, b);
         
-        int d = 4;
+        int d = 3;
         int[][] a = genMatrix(d);
         int[][] b = genMatrix(d);
         printMatrix(a);
@@ -62,6 +64,7 @@ public class Strassen {
         ans = s.multiplyStrassen(a, b, ans);
         s.dumpMatrices();
         printMatrix(ans);
+        s.testPadSize();
     }
     
     public int[][] multiplyStrassen(int[][] a, int[][] b, int[][] ans) {
@@ -80,8 +83,7 @@ public class Strassen {
         return rec_mult(a, b, ans, n, 0, 0);
     }
     
-    public int[][] rec_mult (int[][] a, int[][] b,
-            int[][] c, int n, int j0, int offs) {
+    public int[][] rec_mult (int[][] a, int[][] b, int[][] c, int n, int j0, int offs) {
         int dim = n / 2;
         if (n == 1) {
             c[0][j0] = a[0][j0] * b[0][j0];
@@ -191,7 +193,7 @@ public class Strassen {
         return c;
     }
     
-        public int[][] multiplyStandard(int[][] a, int[][] b) {
+    public int[][] multiplyStandard(int[][] a, int[][] b) {
         checkInput(a, b);
         int n = a.length;
         int[][] c = new int[n][n];
@@ -285,5 +287,22 @@ public class Strassen {
     
     public static boolean isPowerOf2(int n) {
         return (n & -n) == n; 
+    }
+
+    public int padSize (int n){
+        if (isPowerOf2(n)){
+            return n;
+        }else{
+            int counter = CROSSOVER;
+            while (counter < n){
+                counter *= 2;
+            }
+            return counter;
+        }
+    }
+
+    public void testPadSize(){
+        assert (174) == 240;
+        assert (92) == 120;
     }
 }
