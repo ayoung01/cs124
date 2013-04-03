@@ -70,7 +70,7 @@ public class Strassen {
         testPadSize();
     }
     
-    public int[][] multiplyStrassen(int[][] a, int[][] b, int[][] ans) {
+    public int[][] strassen2(int[][] a, int[][] b, int[][] ans) {
         int n = ans.length;
         
         p1 = new int[n/2][n-1];
@@ -196,6 +196,52 @@ public class Strassen {
         return c;
     }
     
+    public int[][] multiplyStrassen(int[][] x, int[][] y) {
+        checkInput(x, y);
+        int n = a.length;
+        if (n <= CROSSOVER) {
+            return multiplyStandard(x, y);
+        }
+        else {
+            int[][] a = new int[n/2][n/2];
+            int[][] b = new int[n/2][n/2];
+            int[][] c = new int[n/2][n/2];
+            int[][] d = new int[n/2][n/2];
+            int[][] e = new int[n/2][n/2];
+            int[][] f = new int[n/2][n/2];
+            int[][] g = new int[n/2][n/2];
+            int[][] h = new int[n/2][n/2];
+
+            int[][] p1 = multiplyStrassen(a, add(f, h, -1));
+            int[][] p2 = multiplyStrassen(add(a, b, 1), h);
+            int[][] p3 = multiplyStrassen(add(c, d, 1), e);
+            int[][] p4 = multiplyStrassen(d, add(g, e, -1));
+            int[][] p5 = multiplyStrassen(add(a, d, 1), add(e, h, 1));
+            int[][] p6 = multiplyStrassen(add(b, d, -1), add(g, h, 1));
+            int[][] p7 = multiplyStrassen(add(a, c, -1), add(e, f, 1));
+
+            // X11 = P5 + P4 + P6 - P2
+            int[][] x11 = add(p5, add(p4, add(p6, p2, -1), 1), 1);
+            // X12 = P1 + P2
+            int[][] x12 = add(p1, p2, 1);
+            // X21 = P3 + P4
+            int[][] x21 = add(p3, p4, 1);
+            // X22 = (P5 + P1) - (P3 + P7)
+            int[][] x22 = add(add(p5, p1, 1), add(p3, p7, 1), -1);
+
+            // replace values of x and return as result
+            for (int i = 0; i < n/2; i++) {
+                for (int j = 0; j < n/2; j++) {
+                    x[i][j] = x11[i][j];
+                    x[i][j + n/2] = x12[i][j];
+                    x[i + n/2][j] = x21[i][j];
+                    x[i + n/2][j + n/2] = x22[i][j];
+                }
+            }
+            return x;
+        }
+    }
+
     public int[][] multiplyStandard(int[][] a, int[][] b) {
         checkInput(a, b);
         int n = a.length;
@@ -249,7 +295,7 @@ public class Strassen {
         int[][] ans = new int[n][n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                ans[i][j] = (int)(Math.round(Math.random() * 9));
+                ans[i][j] = (int)(Math.round(Math.random() * 5));
             }
         }
         return ans;
