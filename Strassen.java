@@ -45,19 +45,19 @@ public class Strassen {
         
         Strassen s = new Strassen();
 
-        int d = 17;
+        int d = 2000;
         int pad = s.padSize(d);
         int[][] a = padMatrix(genMatrix(d), d, pad);
         int[][] b = padMatrix(genMatrix(d), d, pad);
-        System.out.println("Matrix A:");
-        printMatrix(a);
-        System.out.println("Matrix B:");
-        printMatrix(b);
+        // System.out.println("Matrix A:");
+        // printMatrix(a);
+        // System.out.println("Matrix B:");
+        // printMatrix(b);
         
         int[][] ans = new int[pad][pad];
         ans = s.multiplyStrassen(a, b);
         ans = stripMatrix(ans, pad, d);
-        printMatrix(ans);
+        // printMatrix(ans);
         testPadSize();
     }
     
