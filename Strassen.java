@@ -281,4 +281,22 @@ public class Strassen {
         }
         return omat;
     }
+
+    public static void genFile(int n) {
+        try {
+            // Create file 
+            FileWriter fstream = new FileWriter("out.txt");
+            BufferedWriter out = new BufferedWriter(fstream);
+            for (int i = 0; i < 2 * n * n; i++) {
+                String s = "" + (int)(Math.round(Math.random() * 5));
+                out.write(s + "\n");
+            }
+            //Close the output stream
+            out.close();
+        }
+        catch (Exception e){
+            System.err.println("Error: " + e.getMessage());
+        }
+    }
+    
 }
