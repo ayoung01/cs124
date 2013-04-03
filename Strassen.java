@@ -55,7 +55,7 @@ public class Strassen {
         
         Strassen s = new Strassen();
 
-        int d = 20;
+        int d = 16;
         int pad = s.padSize(d);
         int[][] a = padMatrix(genMatrix(d), d, pad);
         int[][] b = padMatrix(genMatrix(d), d, pad);
@@ -63,9 +63,9 @@ public class Strassen {
         printMatrix(b);
         
         int[][] ans = new int[pad][pad];
-        ans = s.multiplyStrassen(a, b, ans);
+        ans = s.multiplyStrassen(a, b);
         ans = stripMatrix(ans, pad, d);
-        s.dumpMatrices();
+        // s.dumpMatrices();
         printMatrix(ans);
         testPadSize();
     }
@@ -198,11 +198,27 @@ public class Strassen {
     
     public int[][] multiplyStrassen(int[][] x, int[][] y) {
         checkInput(x, y);
-        int n = a.length;
+        int n = x.length;
         if (n <= CROSSOVER) {
             return multiplyStandard(x, y);
         }
         else {
+            if (n == 2) {
+                int p1 = x[0][0] * (y[0][1] - y[1][1]);
+                int p2 = (x[0][0] + x[0][1]) * y[1][1];
+                int p3 = (x[1][0] + x[1][1]) * y[0][0];
+                int p4 = x[1][1] * (y[1][0] - y[0][0]);
+                int p5 = (x[0][0] + x[1][1]) * (y[0][0] + y[1][1]);
+                int p6 = (x[0][1] - x[1][1]) * (y[1][0] + y[1][1]);
+                int p7 = (x[0][0] - x[1][0]) * (y[0][0] + y[0][1]);
+
+                x[0][0] = p5 + p4 - p2 + p6;
+                x[0][1] = p1 + p2;
+                x[1][0] = p3 + p4;
+                x[1][1] = p5 + p1 - p3 - p7;
+
+                return x;
+            }
             int[][] a = new int[n/2][n/2];
             int[][] b = new int[n/2][n/2];
             int[][] c = new int[n/2][n/2];
@@ -211,6 +227,19 @@ public class Strassen {
             int[][] f = new int[n/2][n/2];
             int[][] g = new int[n/2][n/2];
             int[][] h = new int[n/2][n/2];
+
+            for (int i = 0; i < n/2; i++) {
+                for (int j = 0; j < n/2; j++) {
+                    a[i][j] = x[i][j];
+                    b[i][j] = x[i][j + n/2];
+                    c[i][j] = x[i + n/2][j];
+                    d[i][j] = x[i + n/2][j + n/2];
+                    e[i][j] = y[i][j];
+                    f[i][j] = y[i][j + n/2];
+                    g[i][j] = y[i + n/2][j];
+                    h[i][j] = y[i + n/2][j + n/2];
+                }
+            }
 
             int[][] p1 = multiplyStrassen(a, add(f, h, -1));
             int[][] p2 = multiplyStrassen(add(a, b, 1), h);
