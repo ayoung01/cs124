@@ -12,16 +12,6 @@ import java.nio.charset.Charset;
 public class Strassen {
     
     final static int CROSSOVER = 15;
-
-    // int[][] p1;
-    // int[][] p2;
-    // int[][] p3;
-    // int[][] p4;
-    // int[][] p5;
-    // int[][] p6;
-    // int[][] p7;
-    // int[][] t1;
-    // int[][] t2;
     
     /**
      * @param args the command line arguments
@@ -67,136 +57,9 @@ public class Strassen {
         int[][] ans = new int[pad][pad];
         ans = s.multiplyStrassen(a, b);
         ans = stripMatrix(ans, pad, d);
-        // s.dumpMatrices();
         printMatrix(ans);
         testPadSize();
     }
-    
-    // public int[][] strassen2(int[][] a, int[][] b, int[][] ans) {
-    //     int n = ans.length;
-        
-    //     p1 = new int[n/2][n-1];
-    //     p2 = new int[n/2][n-1];
-    //     p3 = new int[n/2][n-1];
-    //     p4 = new int[n/2][n-1];
-    //     p5 = new int[n/2][n-1];
-    //     p6 = new int[n/2][n-1];
-    //     p7 = new int[n/2][n-1];
-    //     t1 = new int[n/2][n-1];
-    //     t2 = new int[n/2][n-1];
-        
-    //     return rec_mult(a, b, ans, n, 0, 0);
-    // }
-    
-    // public int[][] rec_mult (int[][] a, int[][] b, int[][] c, int n, int j0, int offs) {
-    //     int dim = n / 2;
-    //     if (n == 1) {
-    //         c[0][j0] = a[0][j0] * b[0][j0];
-    //     }
-    //     else {
-    //         // P1 = A11(B12 - B22)
-    //         // T1 = A11; T2 = B12 - B22
-    //         for (int i = 0; i < dim; i++) {
-    //             for (int j = 0; j < dim; j++) {
-    //                 t1[i][j + offs] = a[i][j + j0];
-    //                 t2[i][j + offs] = b[i][j + j0 + dim] - b[i + dim][j + j0 + dim];
-    //             }
-    //         }
-            
-    //         // P1 = T1 * T2
-    //         rec_mult(t1, t2, p1, dim, offs, offs + dim);
-            
-    //         // P2 = (A11 + A12)B22
-    //         // T1 = A11 + A12; T2 = B22
-    //         for (int i = 0; i < dim; i++) {
-    //             for (int j = 0; j < dim; j++) {
-    //                 t1[i][j + offs] = a[i][j + j0] + a[i][j + j0 + dim];
-    //                 t2[i][j + offs] = b[i + dim][j + j0 + dim];
-    //             }
-    //         }
-            
-    //         // P2 = T1 * T2
-    //         rec_mult(t1, t2, p2, dim, offs, offs + dim);
-            
-    //         // P3 = (A21 + A22)B11
-    //         // T1 = A21 + A22; T2 = B11
-    //         for (int i = 0; i < dim; i++) {
-    //             for (int j = 0; j < dim; j++) {
-    //                 t1[i][j + offs] = a[i + dim][j + j0] + a[i + dim][j + j0 + dim];
-    //                 t2[i][j + offs] = b[i][j + j0];
-    //             }
-    //         }
-            
-    //         // P3 = T1 * T2
-    //         rec_mult(t1, t2, p3, dim, offs, offs + dim);
-            
-    //         // P4 = A22(B21 - B11)
-    //         // T1 = A22; T2 = B21 - B11
-    //         for (int i = 0; i < dim; i++) {
-    //             for (int j = 0; j < dim; j++) {
-    //                 t1[i][j + offs] = a[i + dim][j + j0 + dim];
-    //                 t2[i][j + offs] = b[i + dim][j + j0] - b[i][j + j0];
-    //             }
-    //         }
-            
-    //         // P4 = T1 * T2
-    //         rec_mult(t1, t2, p4, dim, offs, offs + dim);
-            
-    //         // P5 = (A11 + A22)(B11 + B22)
-    //         // T1 = A11 + A22; T2 = B11 + B22
-    //         for (int i = 0; i < dim; i++) {
-    //             for (int j = 0; j < dim; j++) {
-    //                 t1[i][j + offs] = a[i][j + j0] + a[i + dim][j + j0 + dim];
-    //                 t2[i][j + offs] = b[i][j + j0] + b[i + dim][j + j0 + dim];
-    //             }
-    //         }
-            
-    //         // P5 = T1 * T2
-    //         rec_mult(t1, t2, p5, dim, offs, offs + dim);
-            
-    //         // P6 = (A12 - A22)(B21 + B22)
-    //         // T1 = A12 - A22; T2 = B21 + B22
-    //         for (int i = 0; i < dim; i++) {
-    //             for (int j = 0; j < dim; j++) {
-    //                 t1[i][j + offs] = a[i][j + j0 + dim] - a[i + dim][j + j0 + dim];
-    //                 t2[i][j + offs] = b[i + dim][j + j0] + b[i + dim][j + j0 + dim];
-    //             }
-    //         }
-            
-    //         // P6 = T1 * T2
-    //         rec_mult(t1, t2, p6, dim, offs, offs + dim);
-            
-    //         // P7 = (A11 - A21)(B11 + B12)
-    //         // T1 = A11 + A22; T2 = B11 + B12
-    //         for (int i = 0; i < dim; i++) {
-    //             for (int j = 0; j < dim; j++) {
-    //                 t1[i][j + offs] = a[i][j + j0] - a[i + dim][j + j0];
-    //                 t2[i][j + offs] = b[i][j + j0] + b[i][j + j0 + dim];
-    //             }
-    //         }
-            
-    //         // P7 = T1 * T2
-    //         rec_mult(t1, t2, p7, dim, offs, offs + dim);
-    //     }
-        
-    //     // combine
-    //     for (int i = 0; i < dim; i++) {
-    //         for (int j = 0; j < dim; j++) {
-    //             // C11 = P5 + P4 - P2 + P6
-    //             c[i][j + j0] = p5[i][j + offs] + p4[i][j + offs] - p2[i][j + offs] + p6[i][j + offs];
-                
-    //             // C12 = P1 + P2
-    //             c[i][j + j0 + dim] = p1[i][j + offs] + p2[i][j + offs];
-                
-    //             // C21 = P3 + P4
-    //             c[i + dim][j + j0] = p3[i][j + offs] + p4[i][j + offs];
-                
-    //             // C22 = P5 + P1 - P3 - P7
-    //             c[i + dim][j + j0 + dim] = p5[i][j + offs] + p1[i][j + offs] - p3[i][j + offs] - p7[i][j + offs];
-    //         }
-    //     }
-    //     return c;
-    // }
     
     public int[][] multiplyStrassen(int[][] x, int[][] y) {
         checkInput(x, y);
@@ -228,7 +91,6 @@ public class Strassen {
                 ans[0][1] = p1 + p2;
                 ans[1][0] = p3 + p4;
                 ans[1][1] = p5 + p1 - p3 - p7;
-                System.out.println(".");
             }
             else {
                 int[][] a = new int[n/2][n/2];
@@ -270,7 +132,7 @@ public class Strassen {
                 // X22 = (P5 + P1) - (P3 + P7)
                 int[][] x22 = add(add(p5, p1, 1), add(p3, p7, 1), -1);
 
-                // replace values of x and return as result
+                // combine and return result
                 for (int i = 0; i < n/2; i++) {
                     for (int j = 0; j < n/2; j++) {
                         ans[i][j] = x11[i][j];
@@ -284,6 +146,7 @@ public class Strassen {
         }
     }
 
+    /* Computes matrix A x B using conventional algorithm */
     public int[][] multiplyStandard(int[][] a, int[][] b) {
         checkInput(a, b);
         int n = a.length;
@@ -302,6 +165,7 @@ public class Strassen {
         return c;
     }
     
+    /* Adds two matrices */
     public int[][] add(int[][] a, int[][] b, int sign) {
         checkInput(a, b);
         int n = a.length;
@@ -355,27 +219,6 @@ public class Strassen {
         }
         System.out.println();
     }
-    
-    // public void dumpMatrices() {
-    //     System.out.println("P1: ");
-    //     printMatrix(p1);
-    //     System.out.println("P2: ");
-    //     printMatrix(p2);
-    //     System.out.println("P3: ");
-    //     printMatrix(p3);
-    //     System.out.println("P4: ");
-    //     printMatrix(p4);
-    //     System.out.println("P5: ");
-    //     printMatrix(p5);
-    //     System.out.println("P6: ");
-    //     printMatrix(p6);
-    //     System.out.println("P7: ");
-    //     printMatrix(p7);
-    //     System.out.println("T1: ");
-    //     printMatrix(t1);
-    //     System.out.println("T2: ");
-    //     printMatrix(t2);
-    // }
     
     public static boolean isPowerOf2(int n) {
         return (n & -n) == n; 
