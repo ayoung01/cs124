@@ -180,6 +180,14 @@ public class Strassen {
         return ans;
     }
     
+    /* Prints the diagonal entries of matrix A, one per line */
+    public static void printDiagonal(int[][] a) {
+        int n = a.length;
+        for (int i = 0; i < n; i++) {
+            System.out.println(a[i][i]);
+        }
+    }
+
     public static void checkInput(int[][] a, int[][] b) {
         int rows_a = a.length;
         int cols_a = a[0].length;
