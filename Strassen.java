@@ -18,44 +18,44 @@ public class Strassen {
      * $ ./strassen 0 dimension inputfile
      */
     public static void main(String[] args) {
-//        int d = Integer.parseInt(args[2]);
-//        
-//        // dump ASCII file into matrices A and B
-//        int[][]a = new int[d][d];
-//        int[][]b = new int[d][d];
-//        
-//        try {
-//            InputStream fis = new FileInputStream(args[3]);
-//            BufferedReader br = new BufferedReader(new InputStreamReader(fis, Charset.forName("UTF-8")));
-//            for (int i = 0; i < d; i++) {
-//                for (int j = 0; j < d; j++) {
-//                    a[i][j] = Integer.parseInt(br.readLine());
-//                }
-//            }
-//            for (int i = 0; i < d; i++) {
-//                for (int j = 0; j < d; j++) {
-//                    b[i][j] = Integer.parseInt(br.readLine());
-//                }
-//            }
-//        }
-//        catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        checkInput(a, b);
+       int d = Integer.parseInt(args[1]);
+       String filename = args[2];
+       
+       // dump ASCII file into matrices A and B
+       int[][] a = new int[d][d];
+       int[][] b = new int[d][d];
+       
+       try {
+           InputStream fis = new FileInputStream(filename);
+           BufferedReader br = new BufferedReader(new InputStreamReader(fis, Charset.forName("UTF-8")));
+           for (int i = 0; i < d; i++) {
+               for (int j = 0; j < d; j++) {
+                   a[i][j] = Integer.parseInt(br.readLine());
+               }
+           }
+           for (int i = 0; i < d; i++) {
+               for (int j = 0; j < d; j++) {
+                   b[i][j] = Integer.parseInt(br.readLine());
+               }
+           }
+       }
+       catch (Exception e) {
+           e.printStackTrace();
+       }
+       checkInput(a, b);
         
         Strassen s = new Strassen();
 
-        int d = 2000;
         int pad = s.padSize(d);
-        int[][] a = padMatrix(genMatrix(d), d, pad);
-        int[][] b = padMatrix(genMatrix(d), d, pad);
+        int[][] p1 = padMatrix(a, d, pad);
+        int[][] p2 = padMatrix(b, d, pad);
         // System.out.println("Matrix A:");
         // printMatrix(a);
         // System.out.println("Matrix B:");
         // printMatrix(b);
         
         int[][] ans = new int[pad][pad];
-        ans = s.multiplyStrassen(a, b);
+        ans = s.multiplyStrassen(p1, p2);
         ans = stripMatrix(ans, pad, d);
         // printMatrix(ans);
         testPadSize();
