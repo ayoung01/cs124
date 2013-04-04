@@ -20,9 +20,6 @@ public class Strassen {
     public static void main(String[] args) {
        int d = Integer.parseInt(args[1]);
        String filename = args[2];
-       if(Integer.parseInt(args[3]) != 0){
-        CROSSOVER = Integer.parseInt(args[0]);
-       }
        
        // dump ASCII file into matrices A and B
        int[][] a = new int[d][d];
