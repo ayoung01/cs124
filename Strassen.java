@@ -17,7 +17,7 @@ public class Strassen {
      * @param args the command line arguments
      * $ ./strassen 0 dimension inputfile
      */
-    /*public static void main(String[] args) {
+    public static void main(String[] args) {
        int d = Integer.parseInt(args[1]);
        String filename = args[2];
        if(Integer.parseInt(args[3]) != 0){
@@ -62,9 +62,10 @@ public class Strassen {
         ans = stripMatrix(ans, pad, d);
         printDiagonal(ans);
         testPadSize();
-    }*/
+    }
 
-    public static void main(String[] args) {
+    // THIS IS NEEDED FOR CROSSOVER SCRIPT
+    /*public static void main(String[] args) {
         int TRIALS = Integer.parseInt(args[5]);
         long time = System.nanoTime();
         int d = Integer.parseInt(args[1]);
@@ -119,7 +120,7 @@ public class Strassen {
             }
         }
         System.out.println(System.nanoTime()-time);
-    }
+    }*/
     
     public int[][] multiplyStrassen(int[][] x, int[][] y) {
         checkInput(x, y);
@@ -299,10 +300,17 @@ public class Strassen {
             return n;
         }else{
             int counter = CROSSOVER;
+            int counter2 = 1;
             while (counter < n){
                 counter *= 2;
             }
-            return counter;
+            while (counter2 < n){
+                counter2 *= 2;
+            }
+            if (counter <= counter2)
+                return counter;
+            else
+                return counter2;
         }
     }
 

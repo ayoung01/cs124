@@ -13,7 +13,7 @@ public class FileGenerator {
             FileWriter fstream = new FileWriter(n + ".txt");
             BufferedWriter out = new BufferedWriter(fstream);
             for (int i = 0; i < 2 * n * n; i++) {
-                String s = "" + (int)(Math.round(Math.random() * Math.pow(2,12)));
+                String s = "" + (int)(Math.round(Math.random()));
                 out.write(s + "\n");
             }
             //Close the output stream
