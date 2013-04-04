@@ -11,15 +11,18 @@ import java.nio.charset.Charset;
  */
 public class Strassen {
     
-    final static int CROSSOVER = 15;
+    static int CROSSOVER = 15;
     
     /**
      * @param args the command line arguments
      * $ ./strassen 0 dimension inputfile
      */
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
        int d = Integer.parseInt(args[1]);
        String filename = args[2];
+       if(Integer.parseInt(args[3]) != 0){
+        CROSSOVER = Integer.parseInt(args[0]);
+       }
        
        // dump ASCII file into matrices A and B
        int[][] a = new int[d][d];
@@ -57,8 +60,65 @@ public class Strassen {
         int[][] ans = new int[pad][pad];
         ans = s.multiplyStrassen(p1, p2);
         ans = stripMatrix(ans, pad, d);
-        // printMatrix(ans);
+        printDiagonal(ans);
         testPadSize();
+    }*/
+
+    public static void main(String[] args) {
+        int TRIALS = Integer.parseInt(args[5]);
+        long time = System.nanoTime();
+        int d = Integer.parseInt(args[1]);
+        String filename = args[2];
+        if(Integer.parseInt(args[3]) != 0){
+        CROSSOVER = Integer.parseInt(args[3]);
+        }
+
+        for(int counter = 0; counter < TRIALS; counter++){
+            // dump ASCII file into matrices A and B
+            int[][] a = new int[d][d];
+            int[][] b = new int[d][d];
+
+            try {
+               InputStream fis = new FileInputStream(filename);
+               BufferedReader br = new BufferedReader(new InputStreamReader(fis, Charset.forName("UTF-8")));
+               for (int i = 0; i < d; i++) {
+                   for (int j = 0; j < d; j++) {
+                       a[i][j] = Integer.parseInt(br.readLine());
+                   }
+               }
+               for (int i = 0; i < d; i++) {
+                   for (int j = 0; j < d; j++) {
+                       b[i][j] = Integer.parseInt(br.readLine());
+                   }
+               }
+            }
+            catch (Exception e) {
+               e.printStackTrace();
+            }
+            checkInput(a, b);
+            
+            if(Integer.parseInt(args[4]) != 0){
+                Strassen s = new Strassen();
+                int pad = s.padSize(d);
+                int[][] p1 = padMatrix(a, d, pad);
+                int[][] p2 = padMatrix(b, d, pad);
+                // System.out.println("Matrix A:");
+                // printMatrix(a);
+                // System.out.println("Matrix B:");
+                // printMatrix(b);
+                
+                int[][] ans = new int[pad][pad];
+                ans = s.multiplyStrassen(p1, p2);
+                ans = stripMatrix(ans, pad, d);
+                //printDiagonal(ans);
+            }else{
+                Strassen s = new Strassen();
+                int[][] ans = new int[d][d];
+                ans = s.multiplyStandard(a,b);
+                //printDiagonal(ans);
+            }
+        }
+        System.out.println(System.nanoTime()-time);
     }
     
     public int[][] multiplyStrassen(int[][] x, int[][] y) {
@@ -280,23 +340,6 @@ public class Strassen {
             }
         }
         return omat;
-    }
-
-    public static void genFile(int n) {
-        try {
-            // Create file 
-            FileWriter fstream = new FileWriter("out.txt");
-            BufferedWriter out = new BufferedWriter(fstream);
-            for (int i = 0; i < 2 * n * n; i++) {
-                String s = "" + (int)(Math.round(Math.random() * 5));
-                out.write(s + "\n");
-            }
-            //Close the output stream
-            out.close();
-        }
-        catch (Exception e){
-            System.err.println("Error: " + e.getMessage());
-        }
     }
     
 }

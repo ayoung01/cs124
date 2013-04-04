@@ -5,7 +5,8 @@ JC = javac
 	$(JC) $(JFLAGS) $*.java
 
 CLASSES = \
-	Strassen.java
+	Strassen.java \
+	FileGenerator.java
 
 default: classes
 
